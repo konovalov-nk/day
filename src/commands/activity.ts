@@ -449,8 +449,8 @@ function registerCorrectionCommands(activity: Command): void {
         withCtx((ctx) => {
           const result = attributeRange(
             ctx,
-            parseWhen(options.from ?? "", ctx.now(), ctx.timezone),
-            parseWhen(options.to ?? "", ctx.now(), ctx.timezone),
+            parseClock(ctx, options.from ?? ""),
+            parseClock(ctx, options.to ?? ""),
             { force: options.force },
           );
           output(result, options, [

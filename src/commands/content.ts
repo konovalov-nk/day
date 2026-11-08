@@ -364,7 +364,7 @@ export function registerDataCommands(program: Command): void {
           const result = mutate(ctx, "data delete", options.opId, () =>
             deleteEntity(ctx, { task: options.task, note: options.note, session: options.session }),
           );
-          output(result.value, options, [result.value.effect]);
+          output(result.value, options, [`Deleted: ${result.value.deleted}`, result.value.effect]);
         });
       }),
     );

@@ -46,7 +46,7 @@ export function withOperation<T>(ctx: Ctx, spec: OperationSpec, work: () => T): 
       run(
         ctx.db,
         "UPDATE operations SET status = 'done', result_json = ?, updated_at = ? WHERE id = ?",
-        JSON.stringify(result),
+        JSON.stringify(result) ?? "null",
         ctx.now().toISOString(),
         id,
       );

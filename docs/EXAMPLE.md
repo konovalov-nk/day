@@ -42,6 +42,7 @@ make status
 Run the full quality gate:
 
 ```sh
+make e2e-install   # once, if Chromium is not already cached
 make ci
 ```
 

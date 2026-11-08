@@ -221,6 +221,7 @@ export function captureState(ctx: Ctx): {
 }
 
 export function pauseCapture(ctx: Ctx, reason?: string): void {
+  if (captureState(ctx).paused) return;
   run(
     ctx.db,
     "UPDATE capture_state SET paused = 1, paused_at = ?, reason = ?, updated_at = ? WHERE id = 1",

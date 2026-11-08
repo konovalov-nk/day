@@ -2,7 +2,7 @@ DAY_HOST ?= 127.0.0.1
 DAY_PORT ?= 3037
 DAY = npm run --silent day --
 
-.PHONY: help setup prepare demo start stop status open today ci test e2e lint typecheck bench deploy tutorial report clean
+.PHONY: help setup prepare demo start stop status open today ci test e2e e2e-install lint typecheck bench deploy tutorial report clean
 
 help:
 	@echo "Day — local-first daily plan and activity example"
@@ -19,6 +19,7 @@ help:
 	@echo "  make ci         Run lint, types, unit/integration tests, and Playwright"
 	@echo "  make test       Run unit and integration tests"
 	@echo "  make e2e        Run Playwright tests"
+	@echo "  make e2e-install  Download the Chromium browser once"
 	@echo "  make bench      Run the one-year performance check"
 	@echo "  make deploy     Check Caddy and HTTPS"
 	@echo "  make clean      Remove build and test output"
@@ -62,6 +63,9 @@ ci:
 
 test:
 	npm test
+
+e2e-install:
+	npx playwright install chromium
 
 e2e:
 	npx playwright test
