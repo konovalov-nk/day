@@ -22,6 +22,7 @@ import {
   listExclusions,
   pauseCapture,
   recordObservation,
+  recordSourceFailure,
   resumeCapture,
   type ImportRecord,
 } from "../activity.js";
@@ -320,7 +321,17 @@ function registerImportCommands(activity: Command): void {
       action(() => {
         const options = currentOpts<Options>();
         withCtx((ctx) => {
-          const records = JSON.parse(readFileSync(options.file ?? "", "utf8")) as ImportRecord[];
+          let records: ImportRecord[];
+          try {
+            records = JSON.parse(readFileSync(options.file ?? "", "utf8")) as ImportRecord[];
+          } catch (error) {
+            recordSourceFailure(
+              ctx,
+              options.source ?? "activitywatch",
+              error instanceof Error ? error.message : String(error),
+            );
+            throw error;
+          }
           const result = mutate(ctx, `activity import ${options.file}`, undefined, () =>
             importObservations(ctx, options.source ?? "activitywatch", records),
           );
