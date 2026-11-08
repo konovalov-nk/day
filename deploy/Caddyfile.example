@@ -1,0 +1,7 @@
+# Example Caddy site. Merge this into the existing Caddy configuration.
+# If Caddy runs in Docker and Day runs on the host, replace 127.0.0.1
+# with host.docker.internal and ensure the host port is reachable.
+day.home.br11k.dev {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3037
+}

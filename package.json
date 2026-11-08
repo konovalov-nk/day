@@ -1,0 +1,41 @@
+{
+  "name": "day",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "day": "./bin/day"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && cp src/schema.sql dist/schema.sql",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src test e2e scripts",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"e2e/**/*.ts\" \"scripts/**/*.ts\"",
+    "test": "tsx --test test/*.test.ts",
+    "test:e2e": "playwright test",
+    "ci": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run test:e2e",
+    "day": "tsx src/cli.ts",
+    "serve": "tsx src/serve.ts",
+    "demo": "tsx src/cli.ts demo seed",
+    "bench": "tsx scripts/bench.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.56.0",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.5.0",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
+    "typescript": "~5.9.0",
+    "typescript-eslint": "^8.70.0"
+  }
+}

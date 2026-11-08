@@ -1,5 +1,10 @@
 # Day — system specification
 
+> **Example build:** branch `example` contains a runnable TypeScript/SQLite
+> implementation of this specification. Start with
+> [`docs/EXAMPLE.md`](docs/EXAMPLE.md); the specification below remains the
+> source of truth. `make setup && make demo && make start` is the short path.
+
 Prepared 2026-09-25.
 
 ## Purpose
