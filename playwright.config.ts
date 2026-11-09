@@ -22,6 +22,7 @@ export default defineConfig({
       DAY_PASSWORD: "test",
       DAY_READ_TOKEN: "test-token",
       DAY_NOW: "2026-09-25T09:30:00+02:00",
+      DAY_BASE_URL: "http://127.0.0.1:3139",
     },
   },
   projects: [

@@ -1,0 +1,18 @@
+# A label-only container for caddy-docker-proxy on this host.
+# Day itself runs on the host via systemd and listens on 0.0.0.0:3037.
+# The Caddy container has host.docker.internal:host-gateway configured.
+services:
+  day-route:
+    image: alpine:3.22
+    container_name: day-proxy
+    restart: unless-stopped
+    command: sleep infinity
+    networks:
+      - proxy
+    labels:
+      caddy: https://day.home.br11k.dev
+      caddy.reverse_proxy: host.docker.internal:3037
+
+networks:
+  proxy:
+    external: true

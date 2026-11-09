@@ -43,13 +43,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const dbPath = resolve(text("DAY_DB_PATH", resolve(dataDir, "day.sqlite")));
   const port = numberFrom(env.DAY_PORT, 3037);
   const host = text("DAY_HOST", "127.0.0.1");
+  const advertisedHost = host === "0.0.0.0" || host === "::" ? "127.0.0.1" : host;
   return {
     root: ROOT,
     dataDir,
     dbPath,
     host,
     port,
-    baseUrl: text("DAY_BASE_URL", `http://${host}:${port}`),
+    baseUrl: text("DAY_BASE_URL", `http://${advertisedHost}:${port}`),
     timezone: text("DAY_TZ", "Europe/Warsaw"),
     user: text("DAY_USER", "day"),
     password: text("DAY_PASSWORD", "day"),

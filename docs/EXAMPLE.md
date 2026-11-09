@@ -144,6 +144,12 @@ useful for this size of code: cyclomatic complexity at most 15, nesting at most
 parameters. `sonar-project.properties` is included for a real SonarQube run.
 The code is intentionally split by domain rather than by framework layer.
 
+## Deployment
+
+This checkout is also deployed at <https://day.home.br11k.dev> behind the
+existing Caddy/HAProxy edge. See [`DEPLOY.md`](DEPLOY.md) for the route,
+systemd unit, verification commands, and host-specific settings.
+
 ## Reading order
 
 1. `src/schema.sql` — tables and invariants.

@@ -139,6 +139,15 @@ export function setup(ctx: Ctx, options: { demo?: boolean } = {}) {
 }
 
 export function start(ctx: Ctx): { url: string; pid: number } {
+  if (systemdAvailable()) {
+    const current = systemdPid();
+    if (current && systemdActive()) return { url: ctx.config.baseUrl, pid: current };
+    spawnSync("systemctl", ["--user", "start", "day.service"], { stdio: "ignore" });
+    if (!waitForHealth(`http://127.0.0.1:${ctx.config.port}`, 6000)) {
+      throw new AppError("start_failed", "Systemd service did not become healthy", { exitCode: 1 });
+    }
+    return { url: ctx.config.baseUrl, pid: systemdPid() ?? 0 };
+  }
   const pidPath = resolve(ctx.config.dataDir, "day.pid");
   const running = runningPid(ctx);
   if (running) return { url: ctx.config.baseUrl, pid: running };
@@ -159,7 +168,7 @@ export function start(ctx: Ctx): { url: string; pid: number } {
   closeSync(fd);
   if (!child.pid) throw new AppError("start_failed", "Unable to start the server");
   writeFileSync(pidPath, String(child.pid), { mode: 0o600 });
-  const healthy = waitForHealth(ctx.config.baseUrl, 6000);
+  const healthy = waitForHealth(`http://127.0.0.1:${ctx.config.port}`, 6000);
   if (!healthy) {
     throw new AppError("start_failed", `Server did not become healthy. Check ${logPath}`, {
       exitCode: 1,
@@ -197,6 +206,11 @@ export function runningPid(ctx: Ctx): number | null {
 }
 
 export function stop(ctx: Ctx): { stopped: boolean; pid: number | null } {
+  if (systemdAvailable() && systemdActive()) {
+    const pid = systemdPid();
+    spawnSync("systemctl", ["--user", "stop", "day.service"], { stdio: "ignore" });
+    return { stopped: true, pid };
+  }
   const pid = runningPid(ctx);
   if (!pid) {
     rmSync(resolve(ctx.config.dataDir, "day.pid"), { force: true });
@@ -223,8 +237,8 @@ export function stop(ctx: Ctx): { stopped: boolean; pid: number | null } {
 }
 
 export function status(ctx: Ctx) {
-  const pid = runningPid(ctx);
-  const health = pid ? curlHealth(ctx.config.baseUrl) : false;
+  const pid = runningPid(ctx) ?? systemdPid();
+  const health = curlHealth(`http://127.0.0.1:${ctx.config.port}`);
   const capture = captureState(ctx);
   const sources = sourceStates(ctx);
   const counts = {
@@ -236,7 +250,7 @@ export function status(ctx: Ctx) {
   };
   const pending = many<{ id: string }>(ctx.db, "SELECT id FROM operations WHERE status != 'done'");
   return {
-    server: { running: Boolean(pid), pid, healthy: health, url: ctx.config.baseUrl },
+    server: { running: Boolean(pid) || health, pid, healthy: health, url: ctx.config.baseUrl },
     capture: capture.paused ? "paused" : "enabled",
     sources,
     counts,
@@ -246,6 +260,29 @@ export function status(ctx: Ctx) {
 
 function count(ctx: Ctx, table: string): number {
   return one<{ count: number }>(ctx.db, `SELECT COUNT(*) AS count FROM ${table}`)?.count ?? 0;
+}
+
+function systemdAvailable(): boolean {
+  return spawnSync("systemctl", ["--user", "cat", "day.service"], { stdio: "ignore" }).status === 0;
+}
+
+function systemdActive(): boolean {
+  return (
+    spawnSync("systemctl", ["--user", "is-active", "--quiet", "day.service"], { stdio: "ignore" })
+      .status === 0
+  );
+}
+
+function systemdPid(): number | null {
+  const result = spawnSync(
+    "systemctl",
+    ["--user", "show", "-p", "MainPID", "--value", "day.service"],
+    {
+      encoding: "utf8",
+    },
+  );
+  const pid = Number(result.stdout.trim());
+  return result.status === 0 && Number.isFinite(pid) && pid > 0 ? pid : null;
 }
 
 function curlHealth(baseUrl: string): boolean {

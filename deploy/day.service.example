@@ -1,0 +1,16 @@
+[Unit]
+Description=Day dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/git/konovalov-nk/day
+Environment=PATH=%h/.nvm/versions/node/v22.16.0/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=%h/git/konovalov-nk/day/.env
+ExecStart=%h/git/konovalov-nk/day/bin/day serve
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

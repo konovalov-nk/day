@@ -31,6 +31,7 @@ function fixture() {
     DAY_NOW: "2026-09-25T09:00:00+02:00",
     DAY_PASSWORD: "test",
     DAY_READ_TOKEN: "test-token",
+    DAY_BASE_URL: "http://127.0.0.1:3999",
   };
   return { directory, env };
 }
